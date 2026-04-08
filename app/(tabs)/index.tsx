@@ -32,16 +32,13 @@ export default function App() {
 				Go to Sign Up
 			</Link>
 			<Link
-				href="/subscriptions/spotify"
+				href={{ pathname: '/[id]', params: { id: 'spotify' } }}
 				className="mt-4 rounded bg-primary text-white p-4"
 			>
 				Spotify Subscription
 			</Link>
 			<Link
-				href={{
-					pathname: '/subscriptions/[id]',
-					params: { id: 'claude' },
-				}}
+				href={{ pathname: '/[id]', params: { id: 'claude' } }}
 				className="mt-4 rounded bg-primary text-white p-4"
 			>
 				Claude Max Subscription

@@ -1,6 +1,10 @@
 import { AuthBrandHeader } from '@/components/AuthBrandHeader';
 import '@/global.css';
-import { validateEmail, validatePassword, validateVerificationCode } from '@/lib/auth-validation';
+import {
+	validateEmail,
+	validatePassword,
+	validateVerificationCode,
+} from '@/lib/auth-validation';
 import { createFinalizeNavigate } from '@/lib/clerk-finalize';
 import { useAuth, useSignIn } from '@clerk/expo';
 import cn from 'clsx';
@@ -31,7 +35,11 @@ export default function SignInScreen() {
 		if (signIn.status === 'complete') {
 			await signIn.finalize({ navigate });
 		} else if (__DEV__) {
-			console.error('Sign-in attempt not complete:', signIn.status, signIn);
+			console.error(
+				'Sign-in attempt not complete:',
+				signIn.status,
+				signIn,
+			);
 		}
 	};
 
@@ -74,7 +82,11 @@ export default function SignInScreen() {
 				await signIn.mfa.sendEmailCode();
 			}
 		} else if (__DEV__) {
-			console.error('Sign-in attempt not complete:', signIn.status, signIn);
+			console.error(
+				'Sign-in attempt not complete:',
+				signIn.status,
+				signIn,
+			);
 		}
 	};
 
@@ -83,7 +95,13 @@ export default function SignInScreen() {
 		setLocalCodeError(cErr);
 		if (cErr) return;
 
-		await signIn.mfa.verifyEmailCode({ code: code.trim() });
+		const { error } = await signIn.mfa.verifyEmailCode({
+			code: code.trim(),
+		});
+		if (error) {
+			if (__DEV__) console.error('[Clerk MFA verify]', error);
+			return;
+		}
 		await runFinalize();
 	};
 
@@ -106,14 +124,17 @@ export default function SignInScreen() {
 					/>
 					<View className="auth-card">
 						<Text className="auth-helper text-center">
-							If you use an authenticator app or backup codes, continue in the
-							Clerk Account Portal or contact your administrator.
+							If you use an authenticator app or backup codes,
+							continue in the Clerk Account Portal or contact your
+							administrator.
 						</Text>
 						<Pressable
 							className="auth-secondary-button mt-5"
 							onPress={() => signIn.reset()}
 						>
-							<Text className="auth-secondary-button-text">Start over</Text>
+							<Text className="auth-secondary-button-text">
+								Start over
+							</Text>
 						</Pressable>
 					</View>
 				</ScrollView>
@@ -144,11 +165,15 @@ export default function SignInScreen() {
 						<View className="auth-card">
 							<View className="auth-form">
 								<View className="auth-field">
-									<Text className="auth-label">Verification code</Text>
+									<Text className="auth-label">
+										Verification code
+									</Text>
 									<TextInput
 										className={cn(
 											'auth-input',
-											(localCodeError || clerkCodeError) && 'auth-input-error',
+											(localCodeError ||
+												clerkCodeError) &&
+												'auth-input-error',
 										)}
 										value={code}
 										placeholder="Enter the code"
@@ -163,17 +188,22 @@ export default function SignInScreen() {
 										editable={!busy}
 									/>
 									{localCodeError ? (
-										<Text className="auth-error">{localCodeError}</Text>
+										<Text className="auth-error">
+											{localCodeError}
+										</Text>
 									) : null}
 									{clerkCodeError ? (
-										<Text className="auth-error">{clerkCodeError}</Text>
+										<Text className="auth-error">
+											{clerkCodeError}
+										</Text>
 									) : null}
 								</View>
 
 								<Pressable
 									className={cn(
 										'auth-button',
-										(busy || !code.trim()) && 'auth-button-disabled',
+										(busy || !code.trim()) &&
+											'auth-button-disabled',
 									)}
 									disabled={busy || !code.trim()}
 									onPress={onSubmitClientTrustCode}
@@ -181,7 +211,9 @@ export default function SignInScreen() {
 									{busy ? (
 										<ActivityIndicator color="#081126" />
 									) : (
-										<Text className="auth-button-text">Verify & continue</Text>
+										<Text className="auth-button-text">
+											Verify & continue
+										</Text>
 									)}
 								</Pressable>
 
@@ -200,7 +232,9 @@ export default function SignInScreen() {
 									disabled={busy}
 									onPress={() => signIn.reset()}
 								>
-									<Text className="auth-secondary-button-text">Start over</Text>
+									<Text className="auth-secondary-button-text">
+										Start over
+									</Text>
 								</Pressable>
 							</View>
 						</View>
@@ -237,7 +271,10 @@ export default function SignInScreen() {
 							<View className="auth-field">
 								<Text className="auth-label">Email</Text>
 								<TextInput
-									className={cn('auth-input', emailInvalid && 'auth-input-error')}
+									className={cn(
+										'auth-input',
+										emailInvalid && 'auth-input-error',
+									)}
 									autoCapitalize="none"
 									autoComplete="email"
 									autoCorrect={false}
@@ -253,10 +290,14 @@ export default function SignInScreen() {
 									editable={!busy}
 								/>
 								{localEmailError ? (
-									<Text className="auth-error">{localEmailError}</Text>
+									<Text className="auth-error">
+										{localEmailError}
+									</Text>
 								) : null}
 								{clerkIdError ? (
-									<Text className="auth-error">{clerkIdError}</Text>
+									<Text className="auth-error">
+										{clerkIdError}
+									</Text>
 								) : null}
 							</View>
 
@@ -280,10 +321,14 @@ export default function SignInScreen() {
 									editable={!busy}
 								/>
 								{localPasswordError ? (
-									<Text className="auth-error">{localPasswordError}</Text>
+									<Text className="auth-error">
+										{localPasswordError}
+									</Text>
 								) : null}
 								{clerkPasswordError ? (
-									<Text className="auth-error">{clerkPasswordError}</Text>
+									<Text className="auth-error">
+										{clerkPasswordError}
+									</Text>
 								) : null}
 							</View>
 
@@ -309,17 +354,23 @@ export default function SignInScreen() {
 								{busy ? (
 									<ActivityIndicator color="#081126" />
 								) : (
-									<Text className="auth-button-text">Sign in</Text>
+									<Text className="auth-button-text">
+										Sign in
+									</Text>
 								)}
 							</Pressable>
 						</View>
 					</View>
 
 					<View className="auth-link-row">
-						<Text className="auth-link-copy">New to Subspenso? </Text>
+						<Text className="auth-link-copy">
+							New to Subspenso?{' '}
+						</Text>
 						<Link href="/(auth)/sign-up" asChild>
 							<Pressable hitSlop={8}>
-								<Text className="auth-link">Create an account</Text>
+								<Text className="auth-link">
+									Create an account
+								</Text>
 							</Pressable>
 						</Link>
 					</View>

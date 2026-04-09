@@ -64,13 +64,21 @@ export default function SignUpScreen() {
 		const cErr = validateVerificationCode(code);
 		setLocalCodeError(cErr);
 		if (cErr) return;
-
-		await signUp.verifications.verifyEmailCode({ code: code.trim() });
-
+		const { error } = await signUp.verifications.verifyEmailCode({
+			code: code.trim(),
+		});
+		if (error) {
+			if (__DEV__) console.error('[Clerk sign-up verify]', error);
+			return;
+		}
 		if (signUp.status === 'complete') {
 			await signUp.finalize({ navigate: finalizeNavigate });
 		} else if (__DEV__) {
-			console.error('Sign-up attempt not complete:', signUp.status, signUp);
+			console.error(
+				'Sign-up attempt not complete:',
+				signUp.status,
+				signUp,
+			);
 		}
 	};
 
@@ -112,11 +120,15 @@ export default function SignUpScreen() {
 						<View className="auth-card">
 							<View className="auth-form">
 								<View className="auth-field">
-									<Text className="auth-label">Verification code</Text>
+									<Text className="auth-label">
+										Verification code
+									</Text>
 									<TextInput
 										className={cn(
 											'auth-input',
-											(localCodeError || clerkCodeError) && 'auth-input-error',
+											(localCodeError ||
+												clerkCodeError) &&
+												'auth-input-error',
 										)}
 										value={code}
 										placeholder="Enter the 6-digit code"
@@ -131,17 +143,22 @@ export default function SignUpScreen() {
 										editable={!busy}
 									/>
 									{localCodeError ? (
-										<Text className="auth-error">{localCodeError}</Text>
+										<Text className="auth-error">
+											{localCodeError}
+										</Text>
 									) : null}
 									{clerkCodeError ? (
-										<Text className="auth-error">{clerkCodeError}</Text>
+										<Text className="auth-error">
+											{clerkCodeError}
+										</Text>
 									) : null}
 								</View>
 
 								<Pressable
 									className={cn(
 										'auth-button',
-										(busy || !code.trim()) && 'auth-button-disabled',
+										(busy || !code.trim()) &&
+											'auth-button-disabled',
 									)}
 									disabled={busy || !code.trim()}
 									onPress={onVerify}
@@ -149,14 +166,18 @@ export default function SignUpScreen() {
 									{busy ? (
 										<ActivityIndicator color="#081126" />
 									) : (
-										<Text className="auth-button-text">Verify & continue</Text>
+										<Text className="auth-button-text">
+											Verify & continue
+										</Text>
 									)}
 								</Pressable>
 
 								<Pressable
 									className="auth-secondary-button"
 									disabled={busy}
-									onPress={() => signUp.verifications.sendEmailCode()}
+									onPress={() =>
+										signUp.verifications.sendEmailCode()
+									}
 								>
 									<Text className="auth-secondary-button-text">
 										I need a new code
@@ -195,7 +216,10 @@ export default function SignUpScreen() {
 							<View className="auth-field">
 								<Text className="auth-label">Email</Text>
 								<TextInput
-									className={cn('auth-input', emailInvalid && 'auth-input-error')}
+									className={cn(
+										'auth-input',
+										emailInvalid && 'auth-input-error',
+									)}
 									autoCapitalize="none"
 									autoComplete="email"
 									autoCorrect={false}
@@ -211,10 +235,14 @@ export default function SignUpScreen() {
 									editable={!busy}
 								/>
 								{localEmailError ? (
-									<Text className="auth-error">{localEmailError}</Text>
+									<Text className="auth-error">
+										{localEmailError}
+									</Text>
 								) : null}
 								{clerkEmailError ? (
-									<Text className="auth-error">{clerkEmailError}</Text>
+									<Text className="auth-error">
+										{clerkEmailError}
+									</Text>
 								) : null}
 							</View>
 
@@ -241,10 +269,14 @@ export default function SignUpScreen() {
 									At least 8 characters. Avoid common words.
 								</Text>
 								{localPasswordError ? (
-									<Text className="auth-error">{localPasswordError}</Text>
+									<Text className="auth-error">
+										{localPasswordError}
+									</Text>
 								) : null}
 								{clerkPasswordError ? (
-									<Text className="auth-error">{clerkPasswordError}</Text>
+									<Text className="auth-error">
+										{clerkPasswordError}
+									</Text>
 								) : null}
 							</View>
 
@@ -270,7 +302,9 @@ export default function SignUpScreen() {
 								{busy ? (
 									<ActivityIndicator color="#081126" />
 								) : (
-									<Text className="auth-button-text">Continue</Text>
+									<Text className="auth-button-text">
+										Continue
+									</Text>
 								)}
 							</Pressable>
 
@@ -279,7 +313,9 @@ export default function SignUpScreen() {
 					</View>
 
 					<View className="auth-link-row">
-						<Text className="auth-link-copy">Already have an account? </Text>
+						<Text className="auth-link-copy">
+							Already have an account?{' '}
+						</Text>
 						<Link href="/(auth)/sign-in" asChild>
 							<Pressable hitSlop={8}>
 								<Text className="auth-link">Sign in</Text>

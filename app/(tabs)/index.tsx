@@ -4,16 +4,17 @@ import UpcomingSubscriptionCard from '@/components/UpcomingSubscriptionCard';
 import {
 	HOME_BALANCE,
 	HOME_SUBSCRIPTIONS,
-	HOME_USER,
 	UPCOMING_SUBSCRIPTIONS,
 } from '@/constants/data';
 import { icons } from '@/constants/icons';
 import images from '@/constants/images';
 import '@/global.css';
+import { clerkDisplayName } from '@/lib/clerk-user';
 import { formatCurrency } from '@/lib/utils';
+import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
 import { styled } from 'nativewind';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 
@@ -23,6 +24,17 @@ export default function App() {
 	const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
 		string | null
 	>(null);
+	const { user, isLoaded } = useUser();
+
+	const displayName = useMemo(
+		() => (isLoaded ? clerkDisplayName(user) : ''),
+		[isLoaded, user],
+	);
+
+	const avatarSource =
+		user?.imageUrl && user.imageUrl.length > 0
+			? { uri: user.imageUrl }
+			: images.avatar;
 
 	return (
 		<SafeAreaView className="flex-1 p-5 bg-background">
@@ -32,11 +44,11 @@ export default function App() {
 						<View className="home-header">
 							<View className="home-user">
 								<Image
-									source={images.avatar}
+									source={avatarSource}
 									className="home-avatar"
 								/>
 								<Text className="home-user-name">
-									{HOME_USER.name}
+									{isLoaded ? displayName || 'Account' : '…'}
 								</Text>
 							</View>
 

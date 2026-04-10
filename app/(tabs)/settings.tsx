@@ -1,9 +1,6 @@
 import images from '@/constants/images';
 import '@/global.css';
-import {
-	clerkDisplayName,
-	formatClerkMemberSince,
-} from '@/lib/clerk-user';
+import { clerkDisplayName, formatClerkMemberSince } from '@/lib/clerk-user';
 import { useClerk, useUser } from '@clerk/expo';
 import { styled } from 'nativewind';
 import { usePostHog } from 'posthog-react-native';
@@ -75,7 +72,10 @@ const Settings = () => {
 						<Text className="text-sm font-sans-medium text-muted-foreground">
 							Account ID
 						</Text>
-						<Text className="text-sm font-sans-medium text-primary" selectable>
+						<Text
+							className="text-sm font-sans-medium text-primary"
+							selectable
+						>
 							{isLoaded && user?.id ? user.id : '…'}
 						</Text>
 					</View>
@@ -94,10 +94,10 @@ const Settings = () => {
 					<Pressable
 						className="items-center rounded-2xl border border-destructive/35 bg-background py-4 active:opacity-80"
 						onPress={() => {
-						posthog.capture('user_signed_out');
-						posthog.reset();
-						void signOut();
-					}}
+							posthog.capture('user_signed_out');
+							posthog.reset();
+							void signOut();
+						}}
 					>
 						<Text className="text-base font-sans-bold text-destructive">
 							Sign out

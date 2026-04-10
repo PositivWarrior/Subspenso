@@ -35,7 +35,10 @@ export default function SignInScreen() {
 	const runFinalize = async () => {
 		const navigate = createFinalizeNavigate(router);
 		if (signIn.status === 'complete') {
-			const userId = signIn.createdSessionId ?? signIn.identifier ?? emailAddress.trim();
+			const userId =
+				signIn.createdSessionId ??
+				signIn.identifier ??
+				emailAddress.trim();
 			posthog.identify(userId, { email: emailAddress.trim() });
 			posthog.capture('user_signed_in', { method: 'password' });
 			await signIn.finalize({ navigate });
@@ -72,7 +75,9 @@ export default function SignInScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-in]', error);
-			posthog.capture('user_sign_in_failed', { error_code: error.code ?? null });
+			posthog.capture('user_sign_in_failed', {
+				error_code: error.code ?? null,
+			});
 			return;
 		}
 

@@ -57,7 +57,10 @@ export default function SignUpScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-up]', error);
-			posthog.capture('user_sign_up_failed', { step: 'password', error_code: error.code ?? null });
+			posthog.capture('user_sign_up_failed', {
+				step: 'password',
+				error_code: error.code ?? null,
+			});
 			return;
 		}
 		await signUp.verifications.sendEmailCode();
@@ -72,7 +75,10 @@ export default function SignUpScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-up verify]', error);
-			posthog.capture('user_sign_up_failed', { step: 'email_verification', error_code: error.code ?? null });
+			posthog.capture('user_sign_up_failed', {
+				step: 'email_verification',
+				error_code: error.code ?? null,
+			});
 			return;
 		}
 		if (signUp.status === 'complete') {

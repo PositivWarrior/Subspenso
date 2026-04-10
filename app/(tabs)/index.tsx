@@ -14,6 +14,7 @@ import { formatCurrency } from '@/lib/utils';
 import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
 import { styled } from 'nativewind';
+import { usePostHog } from 'posthog-react-native';
 import { useMemo, useState } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -25,6 +26,7 @@ export default function App() {
 		string | null
 	>(null);
 	const { user, isLoaded } = useUser();
+	const posthog = usePostHog();
 
 	const displayName = useMemo(
 		() => (isLoaded ? clerkDisplayName(user) : ''),
@@ -100,11 +102,15 @@ export default function App() {
 					<SubscriptionCard
 						{...item}
 						expanded={expandedSubscriptionId === item.id}
-						onPress={() =>
-							setExpandedSubscriptionId((currentId) =>
-								currentId === item.id ? null : item.id,
-							)
-						}
+						onPress={() => {
+							setExpandedSubscriptionId((currentId) => {
+								const isExpanding = currentId !== item.id;
+								posthog.capture(isExpanding ? 'subscription_expanded' : 'subscription_collapsed', {
+									subscription_id: item.id,
+								});
+								return isExpanding ? item.id : null;
+							});
+						}}
 					/>
 				)}
 				extraData={expandedSubscriptionId}

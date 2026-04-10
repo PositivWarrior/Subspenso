@@ -6,6 +6,7 @@ import {
 } from '@/lib/clerk-user';
 import { useClerk, useUser } from '@clerk/expo';
 import { styled } from 'nativewind';
+import { usePostHog } from 'posthog-react-native';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,6 +15,7 @@ const SafeAreaView = styled(RNSafeAreaView);
 const Settings = () => {
 	const { signOut } = useClerk();
 	const { user, isLoaded } = useUser();
+	const posthog = usePostHog();
 
 	const displayName = clerkDisplayName(user);
 	const email = user?.primaryEmailAddress?.emailAddress ?? '';
@@ -91,7 +93,11 @@ const Settings = () => {
 				<View className="mt-10">
 					<Pressable
 						className="items-center rounded-2xl border border-destructive/35 bg-background py-4 active:opacity-80"
-						onPress={() => void signOut()}
+						onPress={() => {
+						posthog.capture('user_signed_out');
+						posthog.reset();
+						void signOut();
+					}}
 					>
 						<Text className="text-base font-sans-bold text-destructive">
 							Sign out

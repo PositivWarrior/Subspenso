@@ -10,6 +10,7 @@ import { useAuth, useSignUp } from '@clerk/expo';
 import cn from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { styled } from 'nativewind';
+import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import {
 	ActivityIndicator,
@@ -29,6 +30,7 @@ export default function SignUpScreen() {
 	const router = useRouter();
 	const { isSignedIn, isLoaded } = useAuth();
 	const { signUp, errors, fetchStatus } = useSignUp();
+	const posthog = usePostHog();
 	const finalizeNavigate = createFinalizeNavigate(router);
 
 	const [emailAddress, setEmailAddress] = useState('');
@@ -55,6 +57,7 @@ export default function SignUpScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-up]', error);
+			posthog.capture('user_sign_up_failed', { step: 'password', error_code: error.code ?? null });
 			return;
 		}
 		await signUp.verifications.sendEmailCode();
@@ -69,9 +72,16 @@ export default function SignUpScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-up verify]', error);
+			posthog.capture('user_sign_up_failed', { step: 'email_verification', error_code: error.code ?? null });
 			return;
 		}
 		if (signUp.status === 'complete') {
+			const userId = signUp.createdUserId ?? emailAddress.trim();
+			posthog.identify(userId, {
+				email: emailAddress.trim(),
+				$set_once: { first_sign_up_date: new Date().toISOString() },
+			});
+			posthog.capture('user_signed_up', { method: 'password' });
 			await signUp.finalize({ navigate: finalizeNavigate });
 		} else if (__DEV__) {
 			console.error(

@@ -1,5 +1,6 @@
 import { tabs } from '@/constants/data';
 import { colors, components } from '@/constants/theme';
+import { SubscriptionsProvider } from '@/lib/subscriptions-context';
 import { useAuth } from '@clerk/expo';
 import clsx from 'clsx';
 import { Redirect, Tabs } from 'expo-router';
@@ -34,6 +35,7 @@ const TabLayout = () => {
 	}
 
 	return (
+		<SubscriptionsProvider>
 		<Tabs
 			screenOptions={{
 				headerShown: false,
@@ -71,6 +73,7 @@ const TabLayout = () => {
 				/>
 			))}
 		</Tabs>
+		</SubscriptionsProvider>
 	);
 };
 

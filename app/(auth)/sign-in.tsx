@@ -10,6 +10,7 @@ import { useAuth, useSignIn } from '@clerk/expo';
 import cn from 'clsx';
 import { Link, useRouter } from 'expo-router';
 import { styled } from 'nativewind';
+import { usePostHog } from 'posthog-react-native';
 import { useState } from 'react';
 import {
 	ActivityIndicator,
@@ -29,10 +30,17 @@ export default function SignInScreen() {
 	const router = useRouter();
 	const { isLoaded } = useAuth();
 	const { signIn, errors, fetchStatus } = useSignIn();
+	const posthog = usePostHog();
 
 	const runFinalize = async () => {
 		const navigate = createFinalizeNavigate(router);
 		if (signIn.status === 'complete') {
+			const userId =
+				signIn.createdSessionId ??
+				signIn.identifier ??
+				emailAddress.trim();
+			posthog.identify(userId, { email: emailAddress.trim() });
+			posthog.capture('user_signed_in', { method: 'password' });
 			await signIn.finalize({ navigate });
 		} else if (__DEV__) {
 			console.error(
@@ -67,6 +75,9 @@ export default function SignInScreen() {
 		});
 		if (error) {
 			if (__DEV__) console.error('[Clerk sign-in]', error);
+			posthog.capture('user_sign_in_failed', {
+				error_code: error.code ?? null,
+			});
 			return;
 		}
 

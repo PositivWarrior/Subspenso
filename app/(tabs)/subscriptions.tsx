@@ -88,16 +88,17 @@ const Subscriptions = () => {
 							{...item}
 							expanded={expandedSubscriptionId === item.id}
 							onPress={() => {
-								setExpandedSubscriptionId((currentId) => {
-									const isExpanding = currentId !== item.id;
-									posthog.capture(
-										isExpanding
-											? 'subscription_expanded'
-											: 'subscription_collapsed',
-										{ subscription_id: item.id },
-									);
-									return isExpanding ? item.id : null;
-								});
+								const isExpanding =
+									expandedSubscriptionId !== item.id;
+								posthog.capture(
+									isExpanding
+										? 'subscription_expanded'
+										: 'subscription_collapsed',
+									{ subscription_id: item.id },
+								);
+								setExpandedSubscriptionId(
+									isExpanding ? item.id : null,
+								);
 							}}
 						/>
 					)}

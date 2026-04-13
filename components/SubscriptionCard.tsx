@@ -1,10 +1,11 @@
+import SubscriptionBrandMark from '@/components/SubscriptionBrandMark';
 import {
 	formatCurrency,
 	formatStatusLabel,
 	formatSubscriptionDateTime,
 } from '@/lib/utils';
 import clsx from 'clsx';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 const SubscriptionCard = ({
 	name,
@@ -33,7 +34,7 @@ const SubscriptionCard = ({
 		>
 			<View className="sub-head">
 				<View className="sub-main">
-					<Image source={icon} className="sub-icon" />
+					<SubscriptionBrandMark name={name} fallbackSource={icon} />
 					<View className="sub-copy">
 						<Text className="sub-title" numberOfLines={1}>
 							{name}

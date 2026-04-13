@@ -1,5 +1,6 @@
+import SubscriptionBrandMark from '@/components/SubscriptionBrandMark';
 import { formatCurrency } from '@/lib/utils';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 const UpcomingSubscriptionCard = ({
 	name,
@@ -11,7 +12,13 @@ const UpcomingSubscriptionCard = ({
 	return (
 		<View className="upcoming-card">
 			<View className="upcoming-row">
-				<Image source={icon} className="upcoming-icon" />
+				<View className="upcoming-icon">
+					<SubscriptionBrandMark
+						name={name}
+						fallbackSource={icon}
+						variant="upcoming"
+					/>
+				</View>
 				<View>
 					<Text className="upcoming-price">
 						{formatCurrency(price, currency)}

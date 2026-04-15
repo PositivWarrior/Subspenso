@@ -2,6 +2,7 @@ import { icons } from '@/constants/icons';
 import { subscriptionSurfaceColor } from '@/constants/subscription-colors';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { usePostHog } from 'posthog-react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
 	KeyboardAvoidingView,
@@ -49,6 +50,7 @@ const CreateSubscriptionModal = ({
 	onClose,
 	onCreated,
 }: CreateSubscriptionModalProps) => {
+	const posthog = usePostHog();
 	const insets = useSafeAreaInsets();
 	const [name, setName] = useState('');
 	const [price, setPrice] = useState('');
@@ -133,6 +135,14 @@ const CreateSubscriptionModal = ({
 		};
 
 		onCreated(subscription);
+
+		posthog?.capture('subscription_created', {
+			subscription_name: name.trim(),
+			subscription_price: parsedPrice,
+			subscription_frequency: billing,
+			subscription_category: category,
+		});
+
 		onClose();
 	};
 
